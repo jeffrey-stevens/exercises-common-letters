@@ -8,29 +8,26 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 
-#define NUM_LETTERS 26
+const int NUM_LETTERS = 26;
+const uint32_t ALL_LETTERS = (1 << NUM_LETTERS) - 1;
 
 
 typedef struct {
-    bool lower[NUM_LETTERS];
-    bool upper[NUM_LETTERS];
-    int lower_count;
-    int upper_count;
+    uint32_t lower;
+    uint32_t upper;
 } letter_counts;
 
 
 void init_counts(letter_counts * counts) {
 
-    /* Initialize the letter counts to 0. */
+    // Initialize the letter counts to 0.
     for (int i = 0; i < NUM_LETTERS; ++i) {
-        counts->lower[i] = false;
-        counts->upper[i] = false;
+        counts->lower = 0;
+        counts->upper = 0;
     }
-
-    counts->lower_count = 0;
-    counts->upper_count = 0;
 }
 
 
@@ -40,17 +37,11 @@ void add_letter(letter_counts * counts, char currchar) {
 
     if (islower(currchar)) {
         idx = currchar - 'a';
-        if (!counts->lower[idx]) {
-            counts->lower[idx] = true;
-            ++counts->lower_count;
-        }
+        counts->lower |= (1 << idx);
     
     } else if (isupper(currchar)) {
         idx = currchar - 'A';
-        if (!counts->upper[idx]) {
-            counts->upper[idx] = true;
-            ++counts->upper_count;
-        }
+        counts->upper |= (1 << idx);
 
     } else {
         // Not a letter; skip
@@ -61,7 +52,7 @@ void add_letter(letter_counts * counts, char currchar) {
 void tally_letters(char str[], letter_counts * counts) {
 
     char currchar;
-    bool lower_isfull, upper_isfull, isfull;
+    bool lower_isfull, upper_isfull;
 
     init_counts(counts);
 
@@ -69,11 +60,10 @@ void tally_letters(char str[], letter_counts * counts) {
         add_letter(counts, currchar);
 
         // Break if all letters have been represented
-        lower_isfull = counts->lower_count >= NUM_LETTERS;
-        upper_isfull = counts->upper_count >= NUM_LETTERS;
-        isfull = lower_isfull && upper_isfull;
+        lower_isfull = !(counts->lower < ALL_LETTERS);
+        upper_isfull = !(counts->upper < ALL_LETTERS);
 
-        if (isfull) {
+        if (lower_isfull && upper_isfull) {
             break;
         }
     }
@@ -84,9 +74,18 @@ void compare_letters(letter_counts * counts1, letter_counts * counts2) {
 
     char outchar;
 
+    uint32_t mask;
+    uint32_t common_letters_upper = counts1->upper & counts2->upper;
+    uint32_t common_letters_lower = counts1->lower & counts2->lower;
+    bool is_common_letter;
+
     // Uppercase letters
     for (int i = 0; i < NUM_LETTERS; ++i) {
-        if (counts1->upper[i] && counts2->upper[i]) {
+
+        mask = 1 << i;
+        is_common_letter = (common_letters_upper & mask) != 0;
+        
+        if (is_common_letter) {
             outchar = 'A' + (char) i;
             putchar(outchar);
         }
@@ -94,7 +93,11 @@ void compare_letters(letter_counts * counts1, letter_counts * counts2) {
 
     // Lowercase letters
     for (int i = 0; i < NUM_LETTERS; ++i) {
-        if (counts1->lower[i] && counts2->lower[i]) {
+
+        mask = 1 << i;
+        is_common_letter = (common_letters_lower & mask) != 0;
+
+        if (is_common_letter) {
             outchar = 'a' + (char) i;
             putchar(outchar);
         }

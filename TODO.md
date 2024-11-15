@@ -2,9 +2,6 @@
 
 ## Improvements
 
-* Implement in a packed binary representation
-  * (Doesn't add value since the arrays are small, but would be a good exercise...)
-
 
 ## Features
 
