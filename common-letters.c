@@ -7,15 +7,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 
 #define NUM_LETTERS 26
-#define LOWERCASE_OFFSET NUM_LETTERS
 
 
 typedef struct {
-    char lower[NUM_LETTERS];
-    char upper[NUM_LETTERS];
+    bool lower[NUM_LETTERS];
+    bool upper[NUM_LETTERS];
 } letter_counts;
 
 
@@ -23,8 +23,8 @@ void init_counts(letter_counts * counts) {
 
     /* Initialize the letter counts to 0. */
     for (int i = 0; i < NUM_LETTERS; ++i) {
-        counts->lower[i] = 0;
-        counts->upper[i] = 0;
+        counts->lower[i] = false;
+        counts->upper[i] = false;
     }
 }
 
@@ -35,11 +35,11 @@ void add_letter(letter_counts * counts, char currchar) {
 
     if (islower(currchar)) {
         idx = currchar - 'a';
-        ++counts->lower[idx];
+        counts->lower[idx] |= true;
     
     } else if (isupper(currchar)) {
         idx = currchar - 'A';
-        ++counts->upper[idx];
+        counts->upper[idx] |= true;
 
     } else {
         // Not a letter
@@ -65,7 +65,7 @@ void compare_letters(letter_counts * counts1, letter_counts * counts2) {
 
     // Uppercase letters
     for (int i = 0; i < NUM_LETTERS; ++i) {
-        if (counts1->upper[i] > 0 && counts2->upper[i] > 0) {
+        if (counts1->upper[i] && counts2->upper[i]) {
             outchar = 'A' + (char) i;
             putchar(outchar);
         }
@@ -73,7 +73,7 @@ void compare_letters(letter_counts * counts1, letter_counts * counts2) {
 
     // Lowercase letters
     for (int i = 0; i < NUM_LETTERS; ++i) {
-        if (counts1->lower[i] > 0 && counts2->lower[i] > 0) {
+        if (counts1->lower[i] && counts2->lower[i]) {
             outchar = 'a' + (char) i;
             putchar(outchar);
         }
