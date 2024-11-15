@@ -9,8 +9,8 @@
 #include <ctype.h>
 
 
-#define NUM_LETTERS 2 * 26
-#define LOWERCASE_OFFSET 26
+#define NUM_LETTERS 26
+#define LOWERCASE_OFFSET NUM_LETTERS
 
 
 typedef struct {
@@ -83,7 +83,7 @@ void compare_letters(letter_counts * counts1, letter_counts * counts2) {
 
 int main(int argc, char * argv[]) {
 
-    char *string1, *string2;
+    char * string1, * string2;
     letter_counts counts1, counts2;
 
     if (argc < 3) {
