@@ -16,6 +16,8 @@
 typedef struct {
     bool lower[NUM_LETTERS];
     bool upper[NUM_LETTERS];
+    int lower_count;
+    int upper_count;
 } letter_counts;
 
 
@@ -26,6 +28,9 @@ void init_counts(letter_counts * counts) {
         counts->lower[i] = false;
         counts->upper[i] = false;
     }
+
+    counts->lower_count = 0;
+    counts->upper_count = 0;
 }
 
 
@@ -35,14 +40,20 @@ void add_letter(letter_counts * counts, char currchar) {
 
     if (islower(currchar)) {
         idx = currchar - 'a';
-        counts->lower[idx] |= true;
+        if (!counts->lower[idx]) {
+            counts->lower[idx] = true;
+            ++counts->lower_count;
+        }
     
     } else if (isupper(currchar)) {
         idx = currchar - 'A';
-        counts->upper[idx] |= true;
+        if (!counts->upper[idx]) {
+            counts->upper[idx] = true;
+            ++counts->upper_count;
+        }
 
     } else {
-        // Not a letter
+        // Not a letter; skip
     }
 }
 
@@ -50,11 +61,21 @@ void add_letter(letter_counts * counts, char currchar) {
 void tally_letters(char str[], letter_counts * counts) {
 
     char currchar;
+    bool lower_isfull, upper_isfull, isfull;
 
     init_counts(counts);
 
     for (int i = 0; (currchar = str[i]) != '\0'; ++i) {
         add_letter(counts, currchar);
+
+        // Break if all letters have been represented
+        lower_isfull = counts->lower_count >= NUM_LETTERS;
+        upper_isfull = counts->upper_count >= NUM_LETTERS;
+        isfull = lower_isfull && upper_isfull;
+
+        if (isfull) {
+            break;
+        }
     }
 }
 
